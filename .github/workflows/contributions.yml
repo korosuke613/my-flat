@@ -42,4 +42,5 @@ jobs:
           
           git add contribution.json contribution-days.json
           git commit -m "Flat: latest contribution data ($NOW_DATE_TIME)"
+          git pull
           git push origin main
