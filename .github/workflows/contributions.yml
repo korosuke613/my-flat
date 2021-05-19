@@ -1,0 +1,37 @@
+name: Flat
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/contribution.yml
+      - ./postprocess.js
+  workflow_dispatch: null
+  schedule:
+    - cron: "*/5 * * * *"
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+      - name: Fetch data
+        env:
+          GITHUB_TOKEN: "{{ secrets.GITHUB_TOKEN }}"
+        run: |
+          curl -o contribution.json --request POST \
+            --url https://api.github.com/graphql \
+            --header 'Authorization: Bearer GITHUB_TOKEN' \
+            --header 'Content-Type: application/json' \
+            --data '{"query":"{ user(login: \"korosuke613\") { name contributionsCollection { contributionCalendar { totalContributions weeks { contributionDays { contributionCount date } } } } }}"}'
+      - name: git push
+        env:
+          GITHUB_TOKEN: "{{ secrets.GITHUB_TOKEN }}"
+        run: |
+          export NOW_DATE_TIME=$(date '+%Y-%m-%dT%H:%M:%S%z')
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          git add contribution.json
+          git commit -m "Flat: latest contribution data ($NOW_DATE_TIME)"
+          git push origin main
