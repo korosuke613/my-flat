@@ -24,6 +24,7 @@ jobs:
             --header 'Authorization: Bearer $GH_READ_USER_TOKEN' \
             --header 'Content-Type: application/json' \
             --data '{"query":"{ user(login: \"korosuke613\") { name contributionsCollection { contributionCalendar { totalContributions weeks { contributionDays { contributionCount date } } } } }}"}'
+          cat contribution.json
       - name: git push
         env:
           GH_READ_USER_TOKEN: ${{ secrets.GH_READ_USER_TOKEN }}
