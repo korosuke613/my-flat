@@ -15,6 +15,10 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
+      - name: Setup deno
+        uses: denoland/setup-deno@main
+        with:
+          deno-version: v1.x        
       - name: Fetch data
         env:
           GH_READ_USER_TOKEN: ${{ secrets.GH_READ_USER_TOKEN }}
@@ -25,6 +29,9 @@ jobs:
             --header 'Content-Type: application/json' \
             --data '{"query":"{ user(login: \"korosuke613\") { name contributionsCollection { contributionCalendar { totalContributions weeks { contributionDays { contributionCount date } } } } }}"}'
           cat contribution.json
+      - name: generate contribution days
+        run: |
+          deno run --unstable --allow-read --allow-write postprocess-contributions.ts contribution.json
       - name: git push
         env:
           GH_READ_USER_TOKEN: ${{ secrets.GH_READ_USER_TOKEN }}
@@ -33,6 +40,6 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          git add contribution.json
+          git add contribution.json contribution-days.json
           git commit -m "Flat: latest contribution data ($NOW_DATE_TIME)"
           git push origin main
