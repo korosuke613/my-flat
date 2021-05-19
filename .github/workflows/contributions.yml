@@ -17,16 +17,16 @@ jobs:
         uses: actions/checkout@v2
       - name: Fetch data
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_READ_USER_TOKEN }}
+          GH_READ_USER_TOKEN: ${{ secrets.GH_READ_USER_TOKEN }}
         run: |
           curl -o contribution.json --request POST \
             --url https://api.github.com/graphql \
-            --header 'Authorization: Bearer GITHUB_TOKEN' \
+            --header 'Authorization: Bearer $GH_READ_USER_TOKEN' \
             --header 'Content-Type: application/json' \
             --data '{"query":"{ user(login: \"korosuke613\") { name contributionsCollection { contributionCalendar { totalContributions weeks { contributionDays { contributionCount date } } } } }}"}'
       - name: git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_READ_USER_TOKEN }}
+          GH_READ_USER_TOKEN: ${{ secrets.GH_READ_USER_TOKEN }}
         run: |
           export NOW_DATE_TIME=$(date '+%Y-%m-%dT%H:%M:%S%z')
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
